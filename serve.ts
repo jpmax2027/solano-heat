@@ -1,72 +1,79 @@
-// A tiny static server for game/ (Node 22, standard library only), so an entry can be played
-// locally without a build step: `node serve.ts` serves game/ on http://localhost:8080.
-// It sends the MIME types a browser game needs, refuses any path outside game/, and otherwise
-// does nothing clever: this is a development convenience, not a web server for the internet.
-import { createReadStream, statSync } from 'node:fs';
+// SOLANO HEAT — local test server.
+//
+// Serves this repository's root on http://localhost:8080 so the game can be
+// played and screenshotted locally:
+//
+//   node serve.ts            then open http://localhost:8080/game/
+//
+// It also accepts the screenshot hand-back the shot staging uses: a staged
+// page POSTs its canvas as a JPEG to /__save/<name>.jpg and the bytes are
+// written into screenshots/ beside this file. Nothing here is part of the
+// handed-in entry; main.ts is the entrypoint.
+
 import { createServer } from 'node:http';
-import { extname, join, normalize, resolve, sep } from 'node:path';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = resolve(fileURLToPath(new URL('./game', import.meta.url)));
-const args = process.argv.slice(2);
-const portIndex = args.indexOf('--port');
-const requested = portIndex === -1 ? 8080 : Number(args[portIndex + 1]);
-const port = Number.isInteger(requested) && requested > 0 && requested < 65536 ? requested : 8080;
+const root = dirname(fileURLToPath(import.meta.url));
+const shotsDir = join(root, 'screenshots');
+const port = 8080;
 
 const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.mjs': 'text/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2',
-  '.glb': 'model/gltf-binary',
-  '.gltf': 'model/gltf+json',
-  '.bin': 'application/octet-stream',
-  '.wasm': 'application/wasm',
-  '.wav': 'audio/wav',
-  '.mp3': 'audio/mpeg',
-  '.ogg': 'audio/ogg',
-  '.txt': 'text/plain; charset=utf-8',
+  '.ts': 'text/plain; charset=utf-8',
+  '.md': 'text/plain; charset=utf-8',
 };
 
-createServer((request, response) => {
-  const url = new URL(request.url ?? '/', 'http://localhost');
-  let pathname: string;
-  try {
-    pathname = decodeURIComponent(url.pathname);
-  } catch {
-    response.writeHead(400).end('bad request');
+const server = createServer((req, res) => {
+  const url = new URL(req.url ?? '/', `http://localhost:${port}`);
+
+  // Screenshot hand-back: POST /__save/1-start.jpg with the JPEG as the body.
+  if (req.method === 'POST' && url.pathname.startsWith('/__save/')) {
+    const name = url.pathname.slice('/__save/'.length);
+    if (!/^[0-9a-z-]+\.jpg$/.test(name)) {
+      res.writeHead(400).end('bad screenshot name');
+      return;
+    }
+    const chunks: Buffer[] = [];
+    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('end', () => {
+      const body = Buffer.concat(chunks);
+      writeFileSync(join(shotsDir, name), body);
+      console.log(`saved screenshots/${name} (${body.length} bytes)`);
+      res.writeHead(200, { 'content-type': 'text/plain' }).end('saved');
+    });
     return;
   }
-  if (pathname.endsWith('/')) pathname += 'index.html';
-  const file = resolve(join(root, normalize(pathname)));
-  if (file !== root && !file.startsWith(root + sep)) {
-    response.writeHead(403).end('forbidden');
+
+  if (req.method !== 'GET') {
+    res.writeHead(405).end('method not allowed');
     return;
   }
-  let size: number;
-  try {
-    const stats = statSync(file);
-    if (!stats.isFile()) throw new Error('not a file');
-    size = stats.size;
-  } catch {
-    response.writeHead(404).end('not found');
+
+  let path = normalize(decodeURIComponent(url.pathname)).replace(/^[/\\]+/, '');
+  if (path === '' || path === '.') path = 'game/index.html';
+  const full = join(root, path);
+  if (!full.startsWith(root) || !existsSync(full) || !statSync(full).isFile()) {
+    res.writeHead(404, { 'content-type': 'text/plain' }).end('not found');
     return;
   }
-  response.writeHead(200, {
-    'content-type': MIME[extname(file).toLowerCase()] ?? 'application/octet-stream',
-    'content-length': size,
+  res.writeHead(200, {
+    'content-type': MIME[extname(full).toLowerCase()] ?? 'application/octet-stream',
     'cache-control': 'no-store',
   });
-  createReadStream(file).pipe(response);
-}).listen(port, '127.0.0.1', () => {
-  console.log(`game/ is on http://localhost:${port}`);
+  res.end(readFileSync(full));
+});
+
+server.listen(port, () => {
+  console.log(`solano-heat: serving ${root} at http://localhost:${port}/ (game at /game/)`);
 });

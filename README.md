@@ -4,84 +4,60 @@
 [![rank](https://make.fun/badge/gta6-01/jpmax2027/solano-heat/rank.svg)](https://make.fun/bounty/gta6-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-01)
 [![reward](https://make.fun/badge/gta6-01/jpmax2027/solano-heat/reward.svg)](https://make.fun/bounty/gta6-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-01)
 
-SOLANO HEAT is a top-down open-world crime game set in Port Solano, a sun-baked coastal city, built for the make.fun bounty gta6-01 "Make GTA 6". Everything is original: the city, the characters, the cars, the story. Nothing from Rockstar Games — no GTA names, maps, logos, or assets.
+**SOLANO HEAT** is a complete top-down open-world crime game that runs in the
+browser from static files — no build, no libraries, no network. Welcome to
+**Port Solano**, a sun-baked coastal city of downtown blocks, a beach strip
+and a working dock quarter, drawn at golden hour on a full day cycle.
 
-You are Rio Vargas, a getaway driver working for the local crews. Four jobs stand between you and owning the city — if the Solano PD doesn't catch you first.
+You are **Rio Vargas**, a getaway driver fresh in town. Rico at the Taller
+Solano garage has work: a five-job story chain — meet the crew, run a package
+up the beach road, borrow a very collectible Sultan RS, shake a police
+captain who wants an example made of you, and finish with a full-heat run to
+the end of the Muelle 9 pier.
+
+What's in the city:
+
+- A full road grid with intersections, varied buildings (signed landmarks
+  included: the police station, hospital, Hotel Brisa, Casa Azul, the chop
+  shop), sidewalks, palms, lamps, crates, a beach, the sea, and two piers.
+- On foot in 8 directions with collision, or behind the wheel of anything
+  with wheels — every parked and moving car can be taken; traffic drivers
+  bail out and run.
+- Traffic AI that drives the road network and brakes for trouble, and
+  pedestrians who stroll the pavements and flee gunfire and reckless driving.
+- A 1–5 star wanted system: theft, hits, gunfire and mission heat raise it;
+  staying unseen cools it. Interceptors spawn, hunt, ram and box you in —
+  get caught on foot and you're **BUSTED**, hit zero health and you're
+  **WASTED**. Both cost cash and drop you at the station or the hospital.
+- Fists and a mouse-aimed pistol with tracers and muzzle flash, car damage
+  with smoke and wrecks, and health / armor / cash / bribe pickups.
+- A five-mission story with phone dialogue, on-screen objectives, timers,
+  cash rewards and a story-complete state, plus free roam afterwards.
+- HUD with health and armor bars, cash, wanted stars, current car or weapon,
+  dialogue and objective lines, and a live minimap (roads, traffic, police,
+  mission markers).
+- Title, pause, busted and wasted screens; progress (cash, missions,
+  position) saves to localStorage after every job.
+- Procedural WebAudio sound only — engine hum, sirens, gunshots, pickups
+  and a bassline while you drive. No audio files.
+- Polish: day cycle into dusk and night with headlight cones and lit lamps,
+  skid marks, crash screen shake, dust / spark / smoke particles and
+  floating cash text.
+
+Controls (also on the title screen): WASD or arrows to walk and drive,
+**E** or **F** to enter/exit a car, **Shift** to run, mouse to aim,
+click or **Space** to punch and shoot, **1** / **2** for fists / pistol,
+**P** or **Esc** to pause, **M** to mute.
+
+To play, serve the repo root (`node serve.ts`) and open `/game/` — or open
+any static host at `game/index.html`. The four files in `screenshots/` are
+real renders of this build, staged through the game's own `?shot=` scenes.
 
 ## Run it
 
 ```sh
-node serve.ts
-# then open http://localhost:8080 in desktop Chrome
-# or open game/index.html directly — no network needed, plays fully offline
+mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 ```
-
-## How to play
-
-Open `game/index.html` in desktop Chrome (or run `node serve.ts` and open
-http://localhost:8080). No network needed; the game plays fully offline.
-
-| Key | Action |
-| --- | --- |
-| WASD / Arrow keys | Move on foot, drive when in a car |
-| E or F | Enter / steal a car, exit a car |
-| Shift | Run |
-| Mouse + Click / Space | Aim and shoot the pistol |
-| V | Punch |
-| P / Esc | Pause |
-| M | Mute |
-| L (title screen) | Continue a saved game |
-
-## The city
-
-Port Solano is a full open world: a downtown road grid with intersections and
-crosswalks, city blocks full of buildings, a central plaza, a beach strip and
-the sea to the south, and the container docks to the east. Traffic follows the
-road network and stops for cars ahead; pedestrians walk the sidewalks and flee
-from gunfire and reckless driving. Any parked or traffic car can be stolen —
-walk up, press E, and the driver runs for it (the cops notice).
-
-## Systems
-
-- **Driving** — acceleration, braking, steering with drift, skid marks, collisions, camera follow.
-- **Wanted system** — 1–5 stars rise with car theft, hitting pedestrians or cars, and shooting; heat decays when you stay out of trouble.
-- **Police** — cop cars spawn and pursue, faster and more numerous at higher stars; they ram your car, and on foot they can bust you (lose 20% of your cash, respawn at the police station). Health at zero means WASTED (hospital, same penalty).
-- **Combat** — punch and pistol (mouse aim), muzzle flash, hit reactions, health and armor pickups.
-- **Missions + story** — four phone jobs from Marco, with on-screen objectives, dialogue, timers, cash rewards, and a story-complete state:
-  1. *The Package* — pick up a package at the docks.
-  2. *The Delivery* — deliver a car to Marco's Garage before the timer ends.
-  3. *Lose the Heat* — survive three wanted stars until the heat dies down.
-  4. *The Dock Run* — clear the rival Vipers at the docks and reach the pier.
-- **HUD** — health and armor bars, cash, wanted stars, current weapon/vehicle, mission objective, and a live minimap (roads, player arrow, traffic, police in blue, mission marker in gold).
-- **Screens** — title with story intro and controls, pause, busted, wasted, story complete.
-- **Save / load** — cash, mission progress, and position save to localStorage after every mission and on pause; continue with L.
-- **Sound** — procedural WebAudio only: engine hum, police siren, gunshots, pickup chimes, and a bassline loop. No audio files.
-
-## Screenshots
-
-Rendered with headless Chrome from the game's own `?shot=` staging:
-
-1. `1-start.jpg` — title screen over the living city.
-2. `2-city.jpg` — on foot downtown: pedestrians, traffic, mission marker.
-3. `3-drive.jpg` — driving fast through traffic.
-4. `4-chase.jpg` — police chase at three wanted stars.
-
-## Tech
-
-Node 22, standard library only; the game itself is plain static ES modules
-under `game/` (canvas 2D, no libraries, no network requests). `main.ts`
-copies `game/` and `screenshots/` to the output directory and writes
-`dossier.json` via the vendored `vendor/makefun-game.ts`.
-
-Run the dossier build with:
-
-```sh
-mkdir -p /tmp/gta6-out && MAKEFUN_OUTPUT_DIR=/tmp/gta6-out node main.ts
-```
-
-## License
-
-MIT — see `LICENSE`.
 
 ---
 
